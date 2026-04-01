@@ -158,9 +158,9 @@
     }
   },
   "scripts": {
-    "compile": "webpack --mode development",
-    "build": "webpack --mode production",
-    "watch": "webpack --mode development --watch",
+    "compile": "node esbuild.js",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
     "package": "vsce package",
     "typecheck": "tsc --noEmit"
   },
@@ -168,10 +168,8 @@
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^2.22.0",
-    "ts-loader": "^9.5.0",
-    "typescript": "^5.3.0",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.0"
+    "esbuild": "^0.24.0",
+    "typescript": "^5.3.0"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
