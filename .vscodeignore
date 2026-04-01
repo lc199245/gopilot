@@ -1,0 +1,9 @@
+src/**
+!src/webview/index.html
+node_modules/**
+out/**
+.vscode/**
+webpack.config.js
+tsconfig.json
+*.map
+CLAUDE.md

@@ -1,0 +1,180 @@
+{
+  "name": "gopilot",
+  "displayName": "GoPilot",
+  "description": "AI coding assistant powered by configurable LLM backends — Copilot Chat alternative",
+  "version": "0.2.0",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "goPilot.openChat",
+        "title": "GoPilot: Open Chat in Editor"
+      },
+      {
+        "command": "goPilot.newConversation",
+        "title": "GoPilot: New Conversation",
+        "icon": "$(add)"
+      },
+      {
+        "command": "goPilot.focusChat",
+        "title": "GoPilot: Focus Chat"
+      },
+      {
+        "command": "goPilot.explainSelection",
+        "title": "GoPilot: Explain This"
+      },
+      {
+        "command": "goPilot.fixSelection",
+        "title": "GoPilot: Fix This"
+      },
+      {
+        "command": "goPilot.testSelection",
+        "title": "GoPilot: Generate Tests"
+      },
+      {
+        "command": "goPilot.docSelection",
+        "title": "GoPilot: Add Documentation"
+      },
+      {
+        "command": "goPilot.refactorSelection",
+        "title": "GoPilot: Refactor This"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gopilot",
+          "title": "GoPilot",
+          "icon": "$(comment-discussion)"
+        }
+      ]
+    },
+    "views": {
+      "gopilot": [
+        {
+          "type": "webview",
+          "id": "goPilot.chatView",
+          "name": "Chat"
+        }
+      ]
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "goPilot.submenu",
+          "group": "1_gopilot"
+        }
+      ],
+      "goPilot.submenu": [
+        {
+          "command": "goPilot.explainSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "goPilot.fixSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "goPilot.testSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "goPilot.docSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "goPilot.refactorSelection",
+          "when": "editorHasSelection"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "goPilot.newConversation",
+          "when": "view == goPilot.chatView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "goPilot.submenu",
+        "label": "GoPilot"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "goPilot.focusChat",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i"
+      },
+      {
+        "command": "goPilot.newConversation",
+        "key": "ctrl+shift+n",
+        "mac": "cmd+shift+n",
+        "when": "view.goPilot.chatView.visible"
+      }
+    ],
+    "configuration": {
+      "title": "GoPilot",
+      "properties": {
+        "goPilot.activeProvider": {
+          "type": "string",
+          "default": "anthropic",
+          "description": "Active LLM provider ID (e.g. 'anthropic', 'corporate')"
+        },
+        "goPilot.approvalMode": {
+          "type": "string",
+          "enum": ["always-ask", "ask-writes", "auto-approve"],
+          "default": "ask-writes",
+          "description": "Tool approval mode: always-ask, ask-writes (default), or auto-approve"
+        },
+        "goPilot.skills.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable SKILL.md auto-discovery from workspace"
+        },
+        "goPilot.skills.tokenBudget": {
+          "type": "number",
+          "default": 4000,
+          "description": "Max tokens for injected skill content in system prompt"
+        },
+        "goPilot.context.maxOpenFiles": {
+          "type": "number",
+          "default": 5,
+          "description": "Max number of open files included in workspace context"
+        },
+        "goPilot.providers": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Provider configurations keyed by ID. Example:\n```json\n{\n  \"anthropic\": {\n    \"apiKey\": \"${env:ANTHROPIC_API_KEY}\",\n    \"defaultModel\": \"claude-sonnet-4-6\"\n  },\n  \"corporate\": {\n    \"type\": \"openai-compat\",\n    \"baseUrl\": \"https://llm.corp.internal/v1\",\n    \"apiKey\": \"${env:CORP_LLM_KEY}\",\n    \"displayName\": \"Corp LLM\",\n    \"defaultModel\": \"gpt-4\"\n  }\n}\n```"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "webpack --mode development",
+    "build": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "package": "vsce package",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.22.0",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.3.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "marked": "^17.0.5"
+  }
+}
