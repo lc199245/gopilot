@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import { AnthropicProvider } from './providers/anthropic';
 import { OpenAICompatProvider, type OpenAICompatConfig } from './providers/openai-compat';
 import { providerRegistry } from './providers/registry';
@@ -11,6 +13,7 @@ let activeModel = 'claude-sonnet-4-6';
 let chatViewProvider: ChatViewProvider | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
+  loadEnvFile();
   reloadConfiguration();
 
   // Register sidebar webview provider
@@ -113,6 +116,47 @@ function configureOpenAICompat(providerId: string, providers: Record<string, unk
   const provider = new OpenAICompatProvider(providerId, config);
   providerRegistry.register(provider);
   activeProvider = provider;
+}
+
+/**
+ * Load a .env file from the workspace root (or the extension folder).
+ * Sets values into process.env so they're available to resolveEnvVar and API key lookups.
+ */
+function loadEnvFile(): void {
+  const paths: string[] = [];
+
+  // Check workspace root first
+  const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (wsRoot) paths.push(path.join(wsRoot, '.env'));
+
+  // Also check the extension's own folder (for dev mode)
+  paths.push(path.join(__dirname, '..', '.env'));
+
+  for (const envPath of paths) {
+    try {
+      if (!fs.existsSync(envPath)) continue;
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx === -1) continue;
+        const key = trimmed.slice(0, eqIdx).trim();
+        let value = trimmed.slice(eqIdx + 1).trim();
+        // Strip surrounding quotes
+        if ((value.startsWith('"') && value.endsWith('"')) ||
+            (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        // Only set if not already defined (system env takes precedence)
+        if (!process.env[key]) {
+          process.env[key] = value;
+        }
+      }
+    } catch {
+      // Silently skip unreadable .env files
+    }
+  }
 }
 
 function resolveEnvVar(value: string): string {
