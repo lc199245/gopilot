@@ -28,7 +28,7 @@ A VS Code extension that replicates GitHub Copilot Chat, powered by configurable
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/gopilot.git
+git clone https://github.com/lc199245/gopilot.git
 cd gopilot
 
 # 2. Install dependencies
@@ -41,6 +41,8 @@ npm run compile
 code .
 ```
 
+> **Important:** You must run `npm install` and `npm run compile` before launching. The `node_modules/` and `dist/` folders are not checked into git. Skipping this step will cause an activation error.
+
 ### Running in Development
 
 1. Open the project in VS Code
@@ -48,6 +50,14 @@ code .
    - This launches an **Extension Development Host** window with GoPilot loaded
    - The `.vscode/launch.json` is pre-configured to compile and launch
 3. In the new window, click the chat icon in the activity bar (left sidebar) to open GoPilot
+
+### Troubleshooting: "Cannot find module extensionHostProcess.js"
+
+This error means the extension failed to activate, usually because it wasn't compiled:
+
+1. Make sure you ran `npm install` and `npm run compile` first
+2. Try `Ctrl+Shift+P` > "Developer: Reload Window", then F5 again
+3. Verify your VS Code version is **1.85.0 or newer** (`Help > About`) — older corporate installs may have this bug
 
 ### Watch Mode
 
